@@ -2,419 +2,551 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main style={styles.page}>
-      {/* Top Nav */}
-      <header style={styles.nav}>
-        <div style={styles.brand}>
-          <div style={styles.logoMark} aria-hidden />
-          <span style={styles.brandText}>Menu</span>
+    <main className="page">
+      <header className="nav">
+        <div className="brand">
+          <div className="mark" aria-hidden />
+          <span className="brandText">Menu</span>
         </div>
 
-        <nav style={styles.navActions}>
-          <Link href="/login" style={styles.secondaryButton}>
+        <div className="navActions">
+          <Link className="link" href="/login">
             Sign in
           </Link>
-          <Link href="/dashboard" style={styles.primaryButton}>
-            Go to dashboard
+          <Link className="btn" href="/dashboard">
+            Dashboard
           </Link>
-        </nav>
+        </div>
       </header>
 
-      {/* Hero */}
-      <section style={styles.hero}>
-        <div style={styles.heroLeft}>
-          <div style={styles.badge}>QR menu hosting • Simple & fast</div>
+      <section className="hero">
+        <div className="heroLeft">
+          <div className="eyebrow">Simple QR menu hosting</div>
 
-          <h1 style={styles.h1}>
-            Your menu, always up to date — with a single QR code.
+          <h1 className="title">
+            One QR code.
+            <br />
+            Always the latest menu.
           </h1>
 
-          <p style={styles.lede}>
-            Upload a PDF once. Print one QR code. When your menu changes, replace the PDF — the QR stays the same.
+          <p className="subtitle">
+            Upload your menu as a PDF. Print one QR code. When the menu changes, replace the PDF —
+            the QR stays the same.
           </p>
 
-          <div style={styles.ctaRow}>
-            <Link href="/login" style={styles.primaryButtonLarge}>
+          <div className="ctaRow">
+            <Link className="btnPrimary" href="/login">
               Get started
             </Link>
-            <a href="#how-it-works" style={styles.ghostButtonLarge}>
+            <a className="btnGhost" href="#how">
               How it works
             </a>
           </div>
 
-          <div style={styles.trustRow}>
-            <div style={styles.trustItem}>
-              <span style={styles.trustDot} />
-              No app required for customers
-            </div>
-            <div style={styles.trustItem}>
-              <span style={styles.trustDot} />
-              Works on iPhone & Android
-            </div>
-            <div style={styles.trustItem}>
-              <span style={styles.trustDot} />
-              Replace menu anytime
-            </div>
+          <div className="finePrint">
+            No app required. Works instantly in Safari and Chrome.
           </div>
         </div>
 
-        {/* Hero card */}
-        <div style={styles.heroRight}>
-          <div style={styles.previewCard}>
-            <div style={styles.previewHeader}>
-              <div style={styles.previewTitle}>Restaurant Dashboard</div>
-              <div style={styles.previewPill}>Live</div>
+        <div className="heroRight">
+          <div className="device">
+            <div className="deviceTop">
+              <div className="dot" />
+              <div className="dot" />
+              <div className="dot" />
             </div>
 
-            <div style={styles.previewBody}>
-              <div style={styles.previewBlock}>
-                <div style={styles.previewLabel}>Your menu</div>
-                <div style={styles.previewLine} />
-                <div style={styles.previewLineShort} />
+            <div className="deviceBody">
+              <div className="card">
+                <div className="cardTitle">Your menu</div>
+                <div className="line" />
+                <div className="line short" />
               </div>
 
-              <div style={styles.previewBlock}>
-                <div style={styles.previewLabel}>Your QR code</div>
-                <div style={styles.qrMock} aria-hidden>
-                  <div style={styles.qrMockInner} />
-                </div>
+              <div className="card">
+                <div className="cardTitle">Your QR code</div>
+                <div className="qrMock" aria-hidden />
               </div>
 
-              <div style={styles.previewButtons}>
-                <div style={styles.previewBtnPrimary} />
-                <div style={styles.previewBtnSecondary} />
+              <div className="row">
+                <div className="pill dark">Download QR</div>
+                <div className="pill">Copy link</div>
               </div>
             </div>
           </div>
 
-          <div style={styles.miniNote}>
-            Tip: Restaurants love this because the QR code never has to be reprinted.
+          <div className="note">
+            Restaurants love this because they never have to reprint QR codes.
           </div>
         </div>
       </section>
 
-      {/* Feature grid */}
-      <section style={styles.features}>
-        <div style={styles.sectionTitleRow}>
-          <h2 style={styles.h2}>Built for restaurants</h2>
-          <p style={styles.sectionSub}>
-            A clean workflow that feels simple for staff and seamless for customers.
-          </p>
+      <section className="section" id="how">
+        <div className="sectionHeader">
+          <h2 className="h2">How it works</h2>
+          <p className="sectionSub">Three steps. Designed to feel effortless.</p>
         </div>
 
-        <div style={styles.grid}>
-          <FeatureCard
-            title="One QR code forever"
-            desc="Print it once. Keep it on tables, windows, flyers, receipts — your menu link stays stable."
-          />
-          <FeatureCard
-            title="Instant updates"
-            desc="Replace the PDF anytime. Customers always see the latest version when they scan."
-          />
-          <FeatureCard
-            title="Mobile-first viewing"
-            desc="Customers don’t need an app. The menu opens instantly in the browser and displays beautifully."
-          />
-        </div>
-      </section>
+        <div className="steps">
+          <div className="step">
+            <div className="num">1</div>
+            <div>
+              <div className="stepTitle">Sign in</div>
+              <div className="stepDesc">Access your dashboard and create your menu link.</div>
+            </div>
+          </div>
 
-      {/* How it works */}
-      <section id="how-it-works" style={styles.how}>
-        <div style={styles.sectionTitleRow}>
-          <h2 style={styles.h2}>How it works</h2>
-          <p style={styles.sectionSub}>Three steps. That’s it.</p>
-        </div>
+          <div className="step">
+            <div className="num">2</div>
+            <div>
+              <div className="stepTitle">Upload a PDF</div>
+              <div className="stepDesc">Replace it anytime — the QR code stays the same.</div>
+            </div>
+          </div>
 
-        <div style={styles.steps}>
-          <Step n="1" title="Sign in" desc="Create your restaurant account and access your dashboard." />
-          <Step n="2" title="Upload menu PDF" desc="Upload your menu as a PDF. You can replace it anytime." />
-          <Step n="3" title="Download & print QR" desc="Print the QR and place it anywhere customers scan." />
+          <div className="step">
+            <div className="num">3</div>
+            <div>
+              <div className="stepTitle">Print the QR</div>
+              <div className="stepDesc">Customers scan and the menu opens instantly.</div>
+            </div>
+          </div>
         </div>
 
-        <div style={styles.centerCta}>
-          <Link href="/login" style={styles.primaryButtonLarge}>
+        <div className="center">
+          <Link className="btnPrimary" href="/login">
             Create your QR menu
           </Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer style={styles.footer}>
-        <div style={styles.footerInner}>
-          <div style={styles.brand}>
-            <div style={styles.logoMark} aria-hidden />
-            <span style={styles.brandText}>Menu</span>
+      <footer className="footer">
+        <div className="footerInner">
+          <div className="brand">
+            <div className="mark" aria-hidden />
+            <span className="brandText">Menu</span>
           </div>
-          <div style={styles.footerLinks}>
-            <Link href="/login" style={styles.footerLink}>
+
+          <div className="footerLinks">
+            <Link className="link" href="/login">
               Sign in
             </Link>
-            <Link href="/dashboard" style={styles.footerLink}>
+            <Link className="link" href="/dashboard">
               Dashboard
             </Link>
           </div>
         </div>
-        <div style={styles.footerFine}>
-          © {new Date().getFullYear()} Menu. All rights reserved.
-        </div>
+        <div className="copyright">© {new Date().getFullYear()} Menu</div>
       </footer>
+
+      <style jsx global>{`
+        :root {
+          --bg: #ffffff;
+          --fg: #0b0b0f;
+          --muted: rgba(11, 11, 15, 0.7);
+          --hairline: rgba(11, 11, 15, 0.12);
+          --card: rgba(255, 255, 255, 0.72);
+          --shadow: 0 18px 60px rgba(0, 0, 0, 0.08);
+          --radius: 18px;
+        }
+
+        /* Apple-ish system typography */
+        html,
+        body {
+          background: var(--bg);
+          color: var(--fg);
+          margin: 0;
+          padding: 0;
+          font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display",
+            "SF Pro Text", Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        a {
+          color: inherit;
+        }
+
+        .page {
+          min-height: 100vh;
+          padding: 18px;
+          background:
+            radial-gradient(800px 500px at 50% -100px, rgba(0, 0, 0, 0.06), transparent 55%),
+            radial-gradient(600px 450px at 90% 0%, rgba(0, 0, 0, 0.05), transparent 60%),
+            #fff;
+        }
+
+        .nav {
+          max-width: 1120px;
+          margin: 0 auto;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 0 20px;
+        }
+
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .mark {
+          width: 28px;
+          height: 28px;
+          border-radius: 10px;
+          background: #0b0b0f;
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .brandText {
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          font-size: 15px;
+        }
+
+        .navActions {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+
+        .link {
+          text-decoration: none;
+          opacity: 0.82;
+          font-weight: 600;
+        }
+        .link:hover {
+          opacity: 1;
+        }
+
+        .btn,
+        .btnPrimary,
+        .btnGhost {
+          text-decoration: none;
+          border-radius: 999px;
+          padding: 10px 14px;
+          font-weight: 700;
+          font-size: 14px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          transition: transform 0.12s ease, opacity 0.12s ease;
+        }
+
+        .btn {
+          border: 1px solid var(--hairline);
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(10px);
+        }
+
+        .btnPrimary {
+          background: #0b0b0f;
+          color: #fff;
+          border: 1px solid #0b0b0f;
+          padding: 12px 18px;
+        }
+
+        .btnGhost {
+          border: 1px solid var(--hairline);
+          background: transparent;
+          padding: 12px 18px;
+          opacity: 0.9;
+        }
+
+        .btn:hover,
+        .btnPrimary:hover,
+        .btnGhost:hover {
+          transform: translateY(-1px);
+        }
+
+        .hero {
+          max-width: 1120px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: 18px;
+          align-items: center;
+          padding: 18px 0 8px;
+        }
+
+        .eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 12px;
+          border-radius: 999px;
+          border: 1px solid var(--hairline);
+          background: rgba(255, 255, 255, 0.65);
+          backdrop-filter: blur(10px);
+          font-size: 12px;
+          font-weight: 700;
+          opacity: 0.9;
+        }
+
+        .title {
+          margin: 14px 0 12px;
+          font-size: 52px;
+          line-height: 1.02;
+          letter-spacing: -0.05em;
+        }
+
+        .subtitle {
+          margin: 0 0 18px;
+          max-width: 560px;
+          font-size: 16px;
+          line-height: 1.65;
+          color: var(--muted);
+        }
+
+        .ctaRow {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+
+        .finePrint {
+          font-size: 12px;
+          color: var(--muted);
+          opacity: 0.9;
+        }
+
+        .heroRight {
+          display: grid;
+          gap: 10px;
+          justify-items: end;
+        }
+
+        .device {
+          width: 100%;
+          max-width: 420px;
+          border-radius: var(--radius);
+          border: 1px solid var(--hairline);
+          background: var(--card);
+          backdrop-filter: blur(12px);
+          box-shadow: var(--shadow);
+          overflow: hidden;
+        }
+
+        .deviceTop {
+          display: flex;
+          gap: 8px;
+          padding: 12px 14px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+          background: rgba(255, 255, 255, 0.55);
+        }
+
+        .dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 999px;
+          background: rgba(0, 0, 0, 0.18);
+        }
+
+        .deviceBody {
+          padding: 14px;
+          display: grid;
+          gap: 12px;
+        }
+
+        .card {
+          border: 1px solid rgba(0, 0, 0, 0.10);
+          background: #fff;
+          border-radius: 16px;
+          padding: 12px;
+        }
+
+        .cardTitle {
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          opacity: 0.72;
+          margin-bottom: 10px;
+        }
+
+        .line {
+          height: 10px;
+          border-radius: 8px;
+          background: rgba(0, 0, 0, 0.08);
+        }
+        .line.short {
+          width: 70%;
+          margin-top: 8px;
+          background: rgba(0, 0, 0, 0.06);
+        }
+
+        .qrMock {
+          width: 160px;
+          height: 160px;
+          margin: 0 auto;
+          border-radius: 18px;
+          border: 1px dashed rgba(0, 0, 0, 0.18);
+          background:
+            linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.01)),
+            repeating-linear-gradient(
+              90deg,
+              rgba(0, 0, 0, 0.12) 0,
+              rgba(0, 0, 0, 0.12) 6px,
+              transparent 6px,
+              transparent 12px
+            );
+          opacity: 0.7;
+        }
+
+        .row {
+          display: flex;
+          gap: 10px;
+        }
+
+        .pill {
+          flex: 1;
+          height: 40px;
+          border-radius: 14px;
+          border: 1px solid rgba(0, 0, 0, 0.12);
+          background: rgba(0, 0, 0, 0.06);
+          display: grid;
+          place-items: center;
+          font-weight: 800;
+          font-size: 13px;
+          opacity: 0.9;
+        }
+
+        .pill.dark {
+          background: #0b0b0f;
+          color: #fff;
+          border-color: #0b0b0f;
+        }
+
+        .note {
+          max-width: 420px;
+          font-size: 12px;
+          color: var(--muted);
+          text-align: right;
+          padding-right: 4px;
+        }
+
+        .section {
+          max-width: 1120px;
+          margin: 0 auto;
+          padding: 26px 0 32px;
+        }
+
+        .sectionHeader {
+          margin-bottom: 14px;
+        }
+
+        .h2 {
+          margin: 0;
+          font-size: 28px;
+          letter-spacing: -0.03em;
+        }
+
+        .sectionSub {
+          margin: 8px 0 0;
+          color: var(--muted);
+          line-height: 1.6;
+        }
+
+        .steps {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          margin-top: 12px;
+        }
+
+        .step {
+          display: flex;
+          gap: 12px;
+          border: 1px solid rgba(0, 0, 0, 0.10);
+          border-radius: 18px;
+          padding: 16px;
+          background: rgba(255, 255, 255, 0.85);
+        }
+
+        .num {
+          width: 34px;
+          height: 34px;
+          border-radius: 12px;
+          background: #0b0b0f;
+          color: #fff;
+          display: grid;
+          place-items: center;
+          font-weight: 900;
+        }
+
+        .stepTitle {
+          font-weight: 900;
+          letter-spacing: -0.02em;
+          margin-bottom: 6px;
+        }
+
+        .stepDesc {
+          color: var(--muted);
+          line-height: 1.55;
+        }
+
+        .center {
+          display: flex;
+          justify-content: center;
+          margin-top: 16px;
+        }
+
+        .footer {
+          max-width: 1120px;
+          margin: 0 auto;
+          padding: 18px 0 10px;
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .footerInner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .footerLinks {
+          display: flex;
+          gap: 14px;
+          flex-wrap: wrap;
+        }
+
+        .copyright {
+          margin-top: 10px;
+          font-size: 12px;
+          color: var(--muted);
+        }
+
+        /* Responsive (iPhone-perfect) */
+        @media (max-width: 900px) {
+          .hero {
+            grid-template-columns: 1fr;
+          }
+          .heroRight {
+            justify-items: start;
+          }
+          .note {
+            text-align: left;
+          }
+          .steps {
+            grid-template-columns: 1fr;
+          }
+          .title {
+            font-size: 42px;
+          }
+        }
+
+        @media (max-width: 420px) {
+          .title {
+            font-size: 38px;
+          }
+        }
+      `}</style>
     </main>
   );
 }
-
-function FeatureCard({ title, desc }: { title: string; desc: string }) {
-  return (
-    <div style={styles.featureCard}>
-      <div style={styles.featureTitle}>{title}</div>
-      <div style={styles.featureDesc}>{desc}</div>
-    </div>
-  );
-}
-
-function Step({ n, title, desc }: { n: string; title: string; desc: string }) {
-  return (
-    <div style={styles.stepCard}>
-      <div style={styles.stepNum}>{n}</div>
-      <div>
-        <div style={styles.stepTitle}>{title}</div>
-        <div style={styles.stepDesc}>{desc}</div>
-      </div>
-    </div>
-  );
-}
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    padding: 18,
-    background:
-      "radial-gradient(900px 500px at 20% 10%, rgba(0,0,0,0.08), transparent 60%), radial-gradient(700px 500px at 80% 0%, rgba(0,0,0,0.06), transparent 55%), #fff",
-    color: "#0b0b0f",
-  },
-
-  nav: {
-    maxWidth: 1120,
-    margin: "0 auto",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-    padding: "10px 0 18px",
-  },
-  brand: { display: "flex", alignItems: "center", gap: 10 },
-  logoMark: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    background: "#0b0b0f",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
-  },
-  brandText: { fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em" },
-
-  navActions: { display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" },
-
-  hero: {
-    maxWidth: 1120,
-    margin: "0 auto",
-    padding: "18px 0 8px",
-    display: "grid",
-    gridTemplateColumns: "1.1fr 0.9fr",
-    gap: 18,
-    alignItems: "center",
-  },
-
-  heroLeft: { padding: "14px 0" },
-  badge: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    border: "1px solid rgba(0,0,0,0.12)",
-    padding: "8px 12px",
-    borderRadius: 999,
-    background: "rgba(255,255,255,0.7)",
-    backdropFilter: "blur(6px)",
-    fontSize: 12,
-    fontWeight: 600,
-    opacity: 0.9,
-  },
-  h1: { fontSize: 46, lineHeight: 1.04, margin: "14px 0 12px", letterSpacing: "-0.04em" },
-  lede: { fontSize: 16, lineHeight: 1.6, margin: "0 0 18px", opacity: 0.82, maxWidth: 560 },
-
-  ctaRow: { display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 16 },
-
-  trustRow: { display: "flex", gap: 14, flexWrap: "wrap", marginTop: 6, opacity: 0.85 },
-  trustItem: { display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13 },
-  trustDot: { width: 8, height: 8, borderRadius: 99, background: "#0b0b0f", opacity: 0.75 },
-
-  heroRight: { display: "grid", gap: 10 },
-  previewCard: {
-    border: "1px solid rgba(0,0,0,0.12)",
-    borderRadius: 18,
-    background: "rgba(255,255,255,0.75)",
-    backdropFilter: "blur(8px)",
-    boxShadow: "0 18px 60px rgba(0,0,0,0.10)",
-    overflow: "hidden",
-  },
-  previewHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 14,
-    borderBottom: "1px solid rgba(0,0,0,0.08)",
-  },
-  previewTitle: { fontWeight: 800, letterSpacing: "-0.02em" },
-  previewPill: {
-    fontSize: 12,
-    padding: "6px 10px",
-    borderRadius: 999,
-    border: "1px solid rgba(0,0,0,0.12)",
-    background: "#fff",
-    opacity: 0.9,
-  },
-  previewBody: { padding: 14, display: "grid", gap: 12 },
-  previewBlock: {
-    border: "1px solid rgba(0,0,0,0.10)",
-    borderRadius: 14,
-    padding: 12,
-    background: "#fff",
-  },
-  previewLabel: { fontSize: 12, fontWeight: 700, opacity: 0.7, marginBottom: 10 },
-  previewLine: { height: 10, borderRadius: 8, background: "rgba(0,0,0,0.08)" },
-  previewLineShort: { height: 10, width: "70%", borderRadius: 8, marginTop: 8, background: "rgba(0,0,0,0.06)" },
-
-  qrMock: {
-    width: 150,
-    height: 150,
-    borderRadius: 16,
-    border: "1px dashed rgba(0,0,0,0.18)",
-    display: "grid",
-    placeItems: "center",
-    margin: "0 auto",
-    background: "linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01))",
-  },
-  qrMockInner: {
-    width: 110,
-    height: 110,
-    borderRadius: 14,
-    background: "repeating-linear-gradient(90deg, rgba(0,0,0,0.10) 0, rgba(0,0,0,0.10) 6px, transparent 6px, transparent 12px)",
-    opacity: 0.7,
-  },
-
-  previewButtons: { display: "flex", gap: 10 },
-  previewBtnPrimary: { height: 38, flex: 1, borderRadius: 12, background: "#0b0b0f" },
-  previewBtnSecondary: { height: 38, flex: 1, borderRadius: 12, background: "rgba(0,0,0,0.10)" },
-
-  miniNote: { fontSize: 12, opacity: 0.7, paddingLeft: 4 },
-
-  features: { maxWidth: 1120, margin: "0 auto", padding: "28px 0 14px" },
-  sectionTitleRow: { marginBottom: 14 },
-  h2: { fontSize: 26, margin: 0, letterSpacing: "-0.03em" },
-  sectionSub: { margin: "8px 0 0", opacity: 0.75, maxWidth: 640, lineHeight: 1.55 },
-
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: 12,
-  },
-  featureCard: {
-    border: "1px solid rgba(0,0,0,0.10)",
-    borderRadius: 18,
-    padding: 16,
-    background: "rgba(255,255,255,0.8)",
-    boxShadow: "0 10px 40px rgba(0,0,0,0.06)",
-  },
-  featureTitle: { fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 8 },
-  featureDesc: { opacity: 0.78, lineHeight: 1.55 },
-
-  how: { maxWidth: 1120, margin: "0 auto", padding: "24px 0 34px" },
-  steps: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginTop: 12 },
-  stepCard: {
-    display: "flex",
-    gap: 12,
-    border: "1px solid rgba(0,0,0,0.10)",
-    borderRadius: 18,
-    padding: 16,
-    background: "rgba(255,255,255,0.85)",
-  },
-  stepNum: {
-    width: 34,
-    height: 34,
-    borderRadius: 12,
-    background: "#0b0b0f",
-    color: "#fff",
-    display: "grid",
-    placeItems: "center",
-    fontWeight: 900,
-  },
-  stepTitle: { fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 6 },
-  stepDesc: { opacity: 0.78, lineHeight: 1.5 },
-
-  centerCta: { marginTop: 16, display: "flex", justifyContent: "center" },
-
-  footer: {
-    maxWidth: 1120,
-    margin: "0 auto",
-    padding: "22px 0 10px",
-    borderTop: "1px solid rgba(0,0,0,0.08)",
-    marginTop: 20,
-  },
-  footerInner: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" },
-  footerLinks: { display: "flex", gap: 12, flexWrap: "wrap" },
-  footerLink: { textDecoration: "none", opacity: 0.8, color: "#0b0b0f" },
-  footerFine: { marginTop: 10, fontSize: 12, opacity: 0.65 },
-
-  mono: { fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" },
-
-  primaryButton: {
-    textDecoration: "none",
-    background: "#0b0b0f",
-    color: "white",
-    border: "1px solid #0b0b0f",
-    padding: "10px 12px",
-    borderRadius: 12,
-    fontSize: 14,
-    fontWeight: 700,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  secondaryButton: {
-    textDecoration: "none",
-    background: "rgba(255,255,255,0.7)",
-    color: "#0b0b0f",
-    border: "1px solid rgba(0,0,0,0.12)",
-    padding: "10px 12px",
-    borderRadius: 12,
-    fontSize: 14,
-    fontWeight: 700,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primaryButtonLarge: {
-    textDecoration: "none",
-    background: "#0b0b0f",
-    color: "white",
-    border: "1px solid #0b0b0f",
-    padding: "12px 16px",
-    borderRadius: 14,
-    fontSize: 15,
-    fontWeight: 800,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  ghostButtonLarge: {
-    textDecoration: "none",
-    background: "transparent",
-    color: "#0b0b0f",
-    border: "1px solid rgba(0,0,0,0.14)",
-    padding: "12px 16px",
-    borderRadius: 14,
-    fontSize: 15,
-    fontWeight: 800,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-};
