@@ -35,6 +35,10 @@ export default function DashboardView({
 
   return (
     <main style={styles.page}>
+        <div style={{ padding: 14, border: "4px solid red", marginBottom: 12, fontWeight: 700 }}>
+  ✅ NEW DashboardView.tsx is rendering
+</div>
+
       <header style={styles.header}>
         <div>
           <h1 style={styles.h1}>Dashboard</h1>
