@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
 
@@ -26,8 +26,10 @@ export default function DashboardPage() {
   // QR code image (base64 data URL)
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
 
-  // The URL the QR points to (we show it so you can verify)
-  const [qrTargetUrl, setQrTargetUrl] = useState<string>("");
+  // For a nicer UX: show the public menu link (route) + full URL
+  const [menuPageUrl, setMenuPageUrl] = useState<string>("");
+
+  const hasMenu = useMemo(() => Boolean(menuUrl), [menuUrl]);
 
   // ----------------------------------------------------
   // 1) AUTH CHECK (runs once on page load)
@@ -49,23 +51,25 @@ export default function DashboardPage() {
       setUserId(data.user.id);
 
       // Build the menu page URL for the QR code
-      // IMPORTANT: Use the current site origin so it works on Vercel and locally.
-      // - On Vercel: https://your-deployment.vercel.app
-      // - Locally: http://localhost:3000
       const origin = window.location.origin;
-      const menuPageUrl = `${origin}/m/${data.user.id}`;
-
-      setQrTargetUrl(menuPageUrl);
+      const url = `${origin}/m/${data.user.id}`;
+      setMenuPageUrl(url);
 
       try {
-        const qr = await QRCode.toDataURL(menuPageUrl, {
-          width: 320,
+        const qr = await QRCode.toDataURL(url, {
+          width: 360,
           margin: 1,
         });
         setQrDataUrl(qr);
       } catch {
         setQrDataUrl("");
       }
+
+      // Optional: if you want to show "Published" even after refresh,
+      // you can try to infer the public PDF url here too:
+      // const filePath = `${data.user.id}/menu.pdf`;
+      // const { data: pub } = supabase.storage.from("menus").getPublicUrl(filePath);
+      // setMenuUrl(pub.publicUrl);
 
       setLoading(false);
     };
@@ -84,9 +88,7 @@ export default function DashboardPage() {
   // ----------------------------------------------------
   // 3) PDF UPLOAD HANDLER
   // ----------------------------------------------------
-  const handleUploadPdf = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleUploadPdf = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setStatus("");
     setMenuUrl("");
 
@@ -109,12 +111,10 @@ export default function DashboardPage() {
       // Always overwrite the same file so QR never changes
       const filePath = `${userId}/menu.pdf`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("menus")
-        .upload(filePath, file, {
-          upsert: true,
-          contentType: "application/pdf",
-        });
+      const { error: uploadError } = await supabase.storage.from("menus").upload(filePath, file, {
+        upsert: true,
+        contentType: "application/pdf",
+      });
 
       if (uploadError) {
         setStatus(`Upload error: ${uploadError.message}`);
@@ -124,10 +124,31 @@ export default function DashboardPage() {
       const { data } = supabase.storage.from("menus").getPublicUrl(filePath);
 
       setMenuUrl(data.publicUrl);
-      setStatus("Upload complete ✅");
+      setStatus("Menu updated ✅");
     } catch (err: any) {
       setStatus(`Unexpected error: ${err?.message ?? String(err)}`);
+    } finally {
+      // Allow re-uploading the same file name again by resetting input value
+      event.target.value = "";
     }
+  };
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus("Copied ✅");
+      setTimeout(() => setStatus(""), 1200);
+    } catch {
+      setStatus("Copy failed — please copy manually.");
+    }
+  };
+
+  const handleDownloadQr = () => {
+    if (!qrDataUrl) return;
+    const a = document.createElement("a");
+    a.href = qrDataUrl;
+    a.download = "menu-qr.png";
+    a.click();
   };
 
   // ----------------------------------------------------
@@ -135,93 +156,254 @@ export default function DashboardPage() {
   // ----------------------------------------------------
   if (loading) {
     return (
-      <main style={{ padding: 40 }}>
-        <h1>Dashboard</h1>
-        <p>Loading...</p>
+      <main style={styles.page}>
+        <h1 style={styles.h1}>Dashboard</h1>
+        <p style={styles.sub}>Loading your account…</p>
       </main>
     );
   }
+
+  const menuRoute = userId ? `/m/${userId}` : "";
 
   // ----------------------------------------------------
   // DASHBOARD UI
   // ----------------------------------------------------
   return (
-    <main style={{ padding: 40 }}>
-      <h1>Dashboard</h1>
+    <main style={styles.page}>
+      {/* Header */}
+      <header style={styles.header}>
+        <div>
+          <h1 style={styles.h1}>Dashboard</h1>
+          <p style={styles.sub}>
+            Signed in as <span style={styles.mono}>{userEmail}</span>
+          </p>
+        </div>
 
-      <p>
-        Logged in as: <b>{userEmail}</b>
-      </p>
+        <div style={styles.headerActions}>
+          <Link href="/" style={styles.secondaryButton}>
+            Home
+          </Link>
+          <button onClick={handleLogout} style={styles.secondaryButton}>
+            Log out
+          </button>
+        </div>
+      </header>
 
-      {/* ---------------- PDF UPLOAD ---------------- */}
-      <h3 style={{ marginTop: 20 }}>Upload Menu PDF</h3>
+      {/* Status message */}
+      {status && <div style={styles.toast}>{status}</div>}
 
-      <input type="file" accept="application/pdf" onChange={handleUploadPdf} />
+      {/* Main grid */}
+      <section style={styles.grid}>
+        {/* Menu card */}
+        <div style={styles.card}>
+          <div style={styles.cardHeader}>
+            <h2 style={styles.h2}>Your menu</h2>
+            <span style={{ ...styles.badge, ...(hasMenu ? styles.badgeGreen : styles.badgeGray) }}>
+              {hasMenu ? "Published" : "No menu yet"}
+            </span>
+          </div>
 
-      {status && <p style={{ marginTop: 10 }}>{status}</p>}
+          <p style={styles.p}>
+            Upload a PDF menu. Replacing the PDF updates your menu instantly — your QR code never changes.
+          </p>
 
-      {menuUrl && (
-        <p>
-          Public PDF link:{" "}
-          <a href={menuUrl} target="_blank" rel="noreferrer">
-            Open PDF
-          </a>
-        </p>
-      )}
+          <div style={styles.row}>
+            <a
+              href={menuRoute}
+              target="_blank"
+              rel="noreferrer"
+              style={{ ...styles.primaryButton, ...(userId ? {} : styles.disabled) }}
+              aria-disabled={!userId}
+              onClick={(e) => {
+                if (!userId) e.preventDefault();
+              }}
+            >
+              View menu
+            </a>
 
-      {/* ---------------- QR CODE ---------------- */}
-      <div style={{ marginTop: 30 }}>
-        <h3>Menu QR Code</h3>
+            <button
+              type="button"
+              style={{ ...styles.secondaryButton, ...(menuPageUrl ? {} : styles.disabled) }}
+              onClick={() => menuPageUrl && handleCopy(menuPageUrl)}
+              disabled={!menuPageUrl}
+            >
+              Copy link
+            </button>
+          </div>
 
-        {/* Show the route and the full URL the QR targets */}
-        {userId && (
-          <>
-            <p style={{ fontSize: 14 }}>
-              Menu page route:{" "}
-              <a href={`/m/${userId}`} target="_blank" rel="noreferrer">
-                /m/{userId}
+          <div style={styles.divider} />
+
+          <label style={styles.label}>Upload / replace menu (PDF)</label>
+          <input type="file" accept="application/pdf" onChange={handleUploadPdf} style={styles.file} />
+
+          {menuUrl && (
+            <p style={styles.hint}>
+              Latest PDF:{" "}
+              <a href={menuUrl} target="_blank" rel="noreferrer" style={styles.link}>
+                Open PDF
               </a>
             </p>
+          )}
+        </div>
 
-            <p style={{ fontSize: 12, opacity: 0.75 }}>
-              QR target (debug): {qrTargetUrl}
-            </p>
-          </>
-        )}
+        {/* QR card */}
+        <div style={styles.card}>
+          <div style={styles.cardHeader}>
+            <h2 style={styles.h2}>Your QR code</h2>
+          </div>
 
-        {qrDataUrl ? (
-          <img
-            src={qrDataUrl}
-            alt="Menu QR Code"
-            style={{ width: 220, marginTop: 10 }}
-          />
-        ) : (
-          <p>QR not generated.</p>
-        )}
-      </div>
+          <p style={styles.p}>Download and print this QR code so customers can scan your menu.</p>
 
-      {/* ---------------- LOG OUT ---------------- */}
-      <div style={{ marginTop: 30 }}>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "10px 14px",
-            border: "1px solid #ccc",
-            borderRadius: 8,
-            cursor: "pointer",
-            background: "white",
-          }}
-        >
-          Log Out
-        </button>
-      </div>
+          <div style={styles.qrBox}>
+            {qrDataUrl ? (
+              <img src={qrDataUrl} alt="Menu QR Code" style={styles.qrImg} />
+            ) : (
+              <p style={styles.hint}>QR could not be generated.</p>
+            )}
+          </div>
 
-      {/* ---------------- NAV ---------------- */}
-      <div style={{ marginTop: 20 }}>
-        <Link href="/" style={{ textDecoration: "underline" }}>
-          Home
-        </Link>
-      </div>
+          <div style={styles.row}>
+            <button
+              type="button"
+              style={{ ...styles.primaryButton, ...(qrDataUrl ? {} : styles.disabled) }}
+              onClick={handleDownloadQr}
+              disabled={!qrDataUrl}
+            >
+              Download QR (PNG)
+            </button>
+
+            <button
+              type="button"
+              style={{ ...styles.secondaryButton, ...(menuPageUrl ? {} : styles.disabled) }}
+              onClick={() => menuPageUrl && handleCopy(menuPageUrl)}
+              disabled={!menuPageUrl}
+            >
+              Copy menu link
+            </button>
+          </div>
+
+          {menuPageUrl && (
+            <div style={{ marginTop: 12 }}>
+              <div style={styles.label}>Public menu link</div>
+              <div style={styles.monoBox}>
+                <span style={styles.mono}>{menuPageUrl}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
     </main>
   );
 }
+
+const styles: Record<string, React.CSSProperties> = {
+  page: { padding: 18, maxWidth: 1100, margin: "0 auto" },
+
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 12,
+    marginBottom: 16,
+  },
+  headerActions: { display: "flex", gap: 10, alignItems: "center" },
+
+  h1: { fontSize: 28, margin: 0 },
+  h2: { fontSize: 18, margin: 0 },
+
+  sub: { margin: "6px 0 0", opacity: 0.75 },
+  p: { margin: "8px 0 12px", opacity: 0.85, lineHeight: 1.45 },
+
+  grid: { display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 14 },
+
+  card: {
+    gridColumn: "span 12",
+    border: "1px solid #e6e6e6",
+    borderRadius: 14,
+    padding: 16,
+    background: "white",
+    boxShadow: "0 1px 0 rgba(0,0,0,0.03)",
+  },
+
+  cardHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 },
+
+  badge: { fontSize: 12, padding: "5px 10px", borderRadius: 999, border: "1px solid transparent" },
+  badgeGreen: { background: "#e9f8ef", borderColor: "#bfe8cd" },
+  badgeGray: { background: "#f3f4f6", borderColor: "#e5e7eb" },
+
+  row: { display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" },
+  divider: { height: 1, background: "#eee", margin: "14px 0" },
+
+  label: { fontSize: 12, fontWeight: 600, opacity: 0.75, marginBottom: 8 },
+
+  file: {
+    width: "100%",
+    maxWidth: 520,
+    padding: 10,
+    border: "1px solid #e5e5e5",
+    borderRadius: 10,
+    background: "white",
+  },
+
+  hint: { marginTop: 10, fontSize: 12, opacity: 0.7 },
+
+  primaryButton: {
+    appearance: "none",
+    border: "1px solid #111",
+    background: "#111",
+    color: "white",
+    padding: "10px 12px",
+    borderRadius: 10,
+    cursor: "pointer",
+    textDecoration: "none",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 14,
+  },
+
+  secondaryButton: {
+    appearance: "none",
+    border: "1px solid #ddd",
+    background: "white",
+    color: "#111",
+    padding: "10px 12px",
+    borderRadius: 10,
+    cursor: "pointer",
+    textDecoration: "none",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 14,
+  },
+
+  disabled: {
+    opacity: 0.55,
+    cursor: "not-allowed",
+  },
+
+  qrBox: {
+    border: "1px dashed #ddd",
+    borderRadius: 14,
+    padding: 14,
+    display: "grid",
+    placeItems: "center",
+    marginBottom: 12,
+  },
+
+  qrImg: { width: 220, height: 220 },
+
+  link: { textDecoration: "underline" },
+
+  mono: { fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" },
+  monoBox: { border: "1px solid #eee", borderRadius: 10, padding: 10, background: "#fafafa" },
+
+  toast: {
+    border: "1px solid #eee",
+    background: "#fafafa",
+    borderRadius: 12,
+    padding: "10px 12px",
+    marginBottom: 14,
+    fontSize: 14,
+  },
+};
