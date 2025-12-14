@@ -46,7 +46,9 @@ export default function DashboardPage() {
       setUserId(data.user.id);
 
       // Build public menu page URL
-      const menuPageUrl = `http://localhost:3000/m/${data.user.id}`;
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+      const menuPageUrl = `${siteUrl}/m/${data.user.id}`;
+
 
       try {
         // Generate QR code image
