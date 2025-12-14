@@ -4,44 +4,65 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
+
 import { supabase } from "../../lib/supabaseClient";
 
 export default function DashboardPage() {
   const router = useRouter();
 
+  // Logged-in user info
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+
+  // Loading while checking auth
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("");
-  const [menuUrl, setMenuUrl] = useState("");
-  const [qrDataUrl, setQrDataUrl] = useState("");
+
+  // Upload + status messages
+  const [status, setStatus] = useState<string>("");
+
+  // Public menu URL (PDF)
+  const [menuUrl, setMenuUrl] = useState<string>("");
+
+  // QR code image (base64)
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
+
+  // The public menu page URL we want the QR to open
+  const [menuPageUrl, setMenuPageUrl] = useState<string>("");
 
   // ----------------------------------------------------
-  // AUTH CHECK + QR GENERATION
+  // 1) AUTH CHECK (runs once on page load)
   // ----------------------------------------------------
   useEffect(() => {
     const checkAuth = async () => {
+      setLoading(true);
+
       const { data, error } = await supabase.auth.getUser();
 
+      // Not logged in → redirect to /login
       if (error || !data.user) {
         router.push("/login");
         return;
       }
 
+      const id = data.user.id;
+
+      // Save user info
       setUserEmail(data.user.email ?? null);
-      setUserId(data.user.id);
+      setUserId(id);
 
-      // ✅ THIS IS THE FIX:
-      // Dynamically determine site URL at runtime
+      // IMPORTANT:
+      // QR must point to the PUBLIC menu route (/m/<id>), not the dashboard.
+      // siteUrl should be your Vercel URL in production.
       const siteUrl =
-        typeof window !== "undefined"
-          ? window.location.origin
-          : "";
+        (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "") ||
+        "http://localhost:3000";
 
-      const menuPageUrl = `${siteUrl}/m/${data.user.id}`;
+      const publicMenuUrl = `${siteUrl}/m/${id}`;
+      setMenuPageUrl(publicMenuUrl);
 
       try {
-        const qr = await QRCode.toDataURL(menuPageUrl, {
+        // Generate QR code image that opens the public menu URL
+        const qr = await QRCode.toDataURL(publicMenuUrl, {
           width: 300,
           margin: 1,
         });
@@ -57,7 +78,7 @@ export default function DashboardPage() {
   }, [router]);
 
   // ----------------------------------------------------
-  // LOGOUT
+  // 2) LOG OUT
   // ----------------------------------------------------
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -65,7 +86,7 @@ export default function DashboardPage() {
   };
 
   // ----------------------------------------------------
-  // PDF UPLOAD
+  // 3) PDF UPLOAD HANDLER
   // ----------------------------------------------------
   const handleUploadPdf = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -82,36 +103,39 @@ export default function DashboardPage() {
     }
 
     if (!userId) {
-      setStatus("User not ready. Refresh and try again.");
+      setStatus("User not ready yet. Please refresh and try again.");
       return;
     }
 
     setStatus("Uploading...");
 
-    const filePath = `${userId}/menu.pdf`;
+    try {
+      // Always overwrite the same file so the QR never changes
+      const filePath = `${userId}/menu.pdf`;
 
-    const { error } = await supabase.storage
-      .from("menus")
-      .upload(filePath, file, {
-        upsert: true,
-        contentType: "application/pdf",
-      });
+      const { error: uploadError } = await supabase.storage
+        .from("menus")
+        .upload(filePath, file, {
+          upsert: true,
+          contentType: "application/pdf",
+        });
 
-    if (error) {
-      setStatus(`Upload error: ${error.message}`);
-      return;
+      if (uploadError) {
+        setStatus(`Upload error: ${uploadError.message}`);
+        return;
+      }
+
+      const { data } = supabase.storage.from("menus").getPublicUrl(filePath);
+
+      setMenuUrl(data.publicUrl);
+      setStatus("Upload complete ✅");
+    } catch (err: any) {
+      setStatus(`Unexpected error: ${err?.message ?? String(err)}`);
     }
-
-    const { data } = supabase.storage
-      .from("menus")
-      .getPublicUrl(filePath);
-
-    setMenuUrl(data.publicUrl);
-    setStatus("Upload complete ✅");
   };
 
   // ----------------------------------------------------
-  // LOADING
+  // LOADING STATE
   // ----------------------------------------------------
   if (loading) {
     return (
@@ -123,7 +147,7 @@ export default function DashboardPage() {
   }
 
   // ----------------------------------------------------
-  // UI
+  // DASHBOARD UI
   // ----------------------------------------------------
   return (
     <main style={{ padding: 40 }}>
@@ -134,17 +158,13 @@ export default function DashboardPage() {
       </p>
 
       <h3 style={{ marginTop: 20 }}>Upload Menu PDF</h3>
-      <input
-        type="file"
-        accept="application/pdf"
-        onChange={handleUploadPdf}
-      />
+      <input type="file" accept="application/pdf" onChange={handleUploadPdf} />
 
       {status && <p style={{ marginTop: 10 }}>{status}</p>}
 
       {menuUrl && (
         <p>
-          Public PDF:{" "}
+          Public PDF link:{" "}
           <a href={menuUrl} target="_blank" rel="noreferrer">
             Open PDF
           </a>
@@ -154,21 +174,24 @@ export default function DashboardPage() {
       <div style={{ marginTop: 30 }}>
         <h3>Menu QR Code</h3>
 
-        {userId && (
-          <p>
+        {/* Show the FULL public URL (this is what the QR points to) */}
+        {menuPageUrl && (
+          <p style={{ fontSize: 14 }}>
             Menu page:{" "}
-            <a href={`/m/${userId}`} target="_blank" rel="noreferrer">
-              /m/{userId}
+            <a href={menuPageUrl} target="_blank" rel="noreferrer">
+              {menuPageUrl}
             </a>
           </p>
         )}
 
-        {qrDataUrl && (
+        {qrDataUrl ? (
           <img
             src={qrDataUrl}
             alt="Menu QR Code"
             style={{ width: 220, marginTop: 10 }}
           />
+        ) : (
+          <p>QR not generated.</p>
         )}
       </div>
 
