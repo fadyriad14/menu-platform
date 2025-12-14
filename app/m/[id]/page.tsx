@@ -34,14 +34,7 @@ export default async function MenuPage(props: PageProps) {
     <main style={{ padding: 16, maxWidth: 900, margin: "0 auto" }}>
       <h1 style={{ marginBottom: 8 }}>Menu</h1>
 
-      {/* Fallback link (always useful) */}
-      <p style={{ marginBottom: 12 }}>
-        <a href={publicUrl} target="_blank" rel="noreferrer">
-          Open PDF in new tab
-        </a>
-      </p>
-
-      {/* Mobile-friendly scroll viewer */}
+      {/* Viewer handles open/download links + embedded view */}
       <MenuViewer pdfUrl={publicUrl} />
     </main>
   );
