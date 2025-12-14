@@ -43,10 +43,14 @@ export default function MenuViewer({ pdfUrl }: Props) {
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${version}/pdf.worker.min.js`;
 
         // Start loading the PDF
+        const proxiedUrl = `/api/pdf?url=${encodeURIComponent(pdfUrl)}`;
+
+        // Load the PDF through your server (avoids Supabase CORS issues)
         const loadingTask = pdfjsLib.getDocument({
-          url: pdfUrl,
+          url: proxiedUrl,
           withCredentials: false,
         });
+
 
         const pdf = await loadingTask.promise;
 
