@@ -4,54 +4,43 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
-
 import { supabase } from "../../lib/supabaseClient";
 
 export default function DashboardPage() {
   const router = useRouter();
 
-  // Logged-in user info
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-
-  // Loading while checking auth
   const [loading, setLoading] = useState(true);
-
-  // Upload + status messages
-  const [status, setStatus] = useState<string>("");
-
-  // Public menu URL (PDF)
-  const [menuUrl, setMenuUrl] = useState<string>("");
-
-  // QR code image (base64)
-  const [qrDataUrl, setQrDataUrl] = useState<string>("");
+  const [status, setStatus] = useState("");
+  const [menuUrl, setMenuUrl] = useState("");
+  const [qrDataUrl, setQrDataUrl] = useState("");
 
   // ----------------------------------------------------
-  // 1) AUTH CHECK (runs once on page load)
+  // AUTH CHECK + QR GENERATION
   // ----------------------------------------------------
   useEffect(() => {
     const checkAuth = async () => {
-      setLoading(true);
-
       const { data, error } = await supabase.auth.getUser();
 
-      // Not logged in → redirect
       if (error || !data.user) {
         router.push("/login");
         return;
       }
 
-      // Save user info
       setUserEmail(data.user.email ?? null);
       setUserId(data.user.id);
 
-      // Build public menu page URL
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+      // ✅ THIS IS THE FIX:
+      // Dynamically determine site URL at runtime
+      const siteUrl =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : "";
+
       const menuPageUrl = `${siteUrl}/m/${data.user.id}`;
 
-
       try {
-        // Generate QR code image
         const qr = await QRCode.toDataURL(menuPageUrl, {
           width: 300,
           margin: 1,
@@ -68,7 +57,7 @@ export default function DashboardPage() {
   }, [router]);
 
   // ----------------------------------------------------
-  // 2) LOG OUT
+  // LOGOUT
   // ----------------------------------------------------
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -76,7 +65,7 @@ export default function DashboardPage() {
   };
 
   // ----------------------------------------------------
-  // 3) PDF UPLOAD HANDLER
+  // PDF UPLOAD
   // ----------------------------------------------------
   const handleUploadPdf = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -87,49 +76,42 @@ export default function DashboardPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Only allow PDFs
     if (file.type !== "application/pdf") {
       setStatus("Please upload a PDF file.");
       return;
     }
 
     if (!userId) {
-      setStatus("User not ready yet. Please refresh and try again.");
+      setStatus("User not ready. Refresh and try again.");
       return;
     }
 
     setStatus("Uploading...");
 
-    try {
-      // Always overwrite the same file so QR never changes
-      const filePath = `${userId}/menu.pdf`;
+    const filePath = `${userId}/menu.pdf`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("menus") // MUST be lowercase
-        .upload(filePath, file, {
-          upsert: true,
-          contentType: "application/pdf",
-        });
+    const { error } = await supabase.storage
+      .from("menus")
+      .upload(filePath, file, {
+        upsert: true,
+        contentType: "application/pdf",
+      });
 
-      if (uploadError) {
-        setStatus(`Upload error: ${uploadError.message}`);
-        return;
-      }
-
-      // Get public URL
-      const { data } = supabase.storage
-        .from("menus")
-        .getPublicUrl(filePath);
-
-      setMenuUrl(data.publicUrl);
-      setStatus("Upload complete ✅");
-    } catch (err: any) {
-      setStatus(`Unexpected error: ${err?.message ?? String(err)}`);
+    if (error) {
+      setStatus(`Upload error: ${error.message}`);
+      return;
     }
+
+    const { data } = supabase.storage
+      .from("menus")
+      .getPublicUrl(filePath);
+
+    setMenuUrl(data.publicUrl);
+    setStatus("Upload complete ✅");
   };
 
   // ----------------------------------------------------
-  // LOADING STATE
+  // LOADING
   // ----------------------------------------------------
   if (loading) {
     return (
@@ -141,7 +123,7 @@ export default function DashboardPage() {
   }
 
   // ----------------------------------------------------
-  // DASHBOARD UI
+  // UI
   // ----------------------------------------------------
   return (
     <main style={{ padding: 40 }}>
@@ -151,9 +133,7 @@ export default function DashboardPage() {
         Logged in as: <b>{userEmail}</b>
       </p>
 
-      {/* ---------------- PDF UPLOAD ---------------- */}
       <h3 style={{ marginTop: 20 }}>Upload Menu PDF</h3>
-
       <input
         type="file"
         accept="application/pdf"
@@ -164,19 +144,18 @@ export default function DashboardPage() {
 
       {menuUrl && (
         <p>
-          Public PDF link:{" "}
+          Public PDF:{" "}
           <a href={menuUrl} target="_blank" rel="noreferrer">
             Open PDF
           </a>
         </p>
       )}
 
-      {/* ---------------- QR CODE ---------------- */}
       <div style={{ marginTop: 30 }}>
         <h3>Menu QR Code</h3>
 
         {userId && (
-          <p style={{ fontSize: 14 }}>
+          <p>
             Menu page:{" "}
             <a href={`/m/${userId}`} target="_blank" rel="noreferrer">
               /m/{userId}
@@ -184,18 +163,15 @@ export default function DashboardPage() {
           </p>
         )}
 
-        {qrDataUrl ? (
+        {qrDataUrl && (
           <img
             src={qrDataUrl}
             alt="Menu QR Code"
             style={{ width: 220, marginTop: 10 }}
           />
-        ) : (
-          <p>QR not generated.</p>
         )}
       </div>
 
-      {/* ---------------- LOG OUT ---------------- */}
       <div style={{ marginTop: 30 }}>
         <button
           onClick={handleLogout}
@@ -211,7 +187,6 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {/* ---------------- NAV ---------------- */}
       <div style={{ marginTop: 20 }}>
         <Link href="/" style={{ textDecoration: "underline" }}>
           Home
