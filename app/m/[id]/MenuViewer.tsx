@@ -24,15 +24,18 @@ export default function MenuViewer({ pdfUrl }: Props) {
       setStatus("Loading menu...");
 
       // Dynamically import pdfjs to avoid SSR issues
-      const pdfjsLib = await import("pdfjs-dist/build/pdf");
+      const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
+
 
       // Point PDF.js at its worker file
       // (This is the most reliable way in Next.js)
       // @ts-ignore
-      pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-        "pdfjs-dist/build/pdf.worker.min.mjs",
+      // @ts-ignore
+        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+        "pdfjs-dist/legacy/build/pdf.worker.min.mjs",
         import.meta.url
-      ).toString();
+        ).toString();
+
 
       try {
         // Load the PDF document
